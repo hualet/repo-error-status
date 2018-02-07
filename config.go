@@ -6,15 +6,21 @@ import (
 )
 
 type config struct {
-	InfluxDBHost string `json:"influxdb_host"`
-	InfluxDBPort uint16 `json:"influxdb_port"`
+	InfluxDBHost     string `json:"influxdb_host"`
+	InfluxDBPort     uint16 `json:"influxdb_port"`
+	InfluxDBUserName string `json:"influxdb_username"`
+	InfluxDBPassword string `json:"influxdb_password"`
+	InfluxDBName     string `json:"influxdb_name"`
 
 	Repos []Repo `json:"repos"`
 }
 
 var defaultConfig = &config{
-	InfluxDBHost: "10.0.10.65",
-	InfluxDBPort: 8806,
+	InfluxDBHost:     "",
+	InfluxDBPort:     8806,
+	InfluxDBUserName: "",
+	InfluxDBPassword: "",
+	InfluxDBName:     "",
 
 	Repos: []Repo{
 		Repo{
