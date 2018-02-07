@@ -1,17 +1,26 @@
 package main
 
-import "github.com/Sirupsen/logrus"
+import (
+	"github.com/Sirupsen/logrus"
+)
 
 func main() {
-	repo := &Repo{
-		Name:         "Debian Stable",
-		Host:         "http://ftp.cn.debian.org/debian",
-		Distribution: "stable",
-		Arch:         "amd64",
-	}
+	repos := defaultConfig.Repos
 
-	err := inspect(repo)
-	if err != nil {
-		logrus.Fatal(err)
+	for _, repo := range repos {
+		// not using goroutine here because r-inspector consumes too much system
+		// resource, no need to parallize two instances.
+		result, err := inspect(&repo)
+
+		if err != nil {
+			logrus.Errorf("failed to inspect repo: %s, %s", repo.Name, err)
+			continue
+		}
+
+		err = report(result)
+		if err != nil {
+			logrus.Errorf("failed to report inspect result of %s: %s", repo.Name, err)
+			continue
+		}
 	}
 }
