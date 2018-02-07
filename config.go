@@ -1,5 +1,10 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 type config struct {
 	InfluxDBHost string `json:"influxdb_host"`
 	InfluxDBPort uint16 `json:"influxdb_port"`
@@ -31,4 +36,13 @@ var defaultConfig = &config{
 			Arch:         "amd64",
 		},
 	},
+}
+
+func dumpDefaultConfig() error {
+	data, err := json.MarshalIndent(defaultConfig, "", "    ")
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Print(string(data))
+	return err
 }
