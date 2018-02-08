@@ -41,11 +41,6 @@ func report(result *Result) error {
 		return err
 	}
 
-	err = createDatabase(dbClient, defaultConfig.InfluxDBName)
-	if err != nil {
-		logrus.Infof("failed to create database: %v", err)
-	}
-
 	logrus.Infof("%#v", result)
 
 	// Create a new point batch
