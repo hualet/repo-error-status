@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -41,7 +42,8 @@ func report(result *Result) error {
 		return err
 	}
 
-	logrus.Infof("%#v", result)
+	data, _ := json.MarshalIndent(result, "", "    ")
+	logrus.Infof("reporting result: %s", string(data))
 
 	// Create a new point batch
 	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
