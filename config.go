@@ -3,6 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+
+	"github.com/Sirupsen/logrus"
+)
+
+const (
+	defaultConfigPath = "/etc/repo-error-status/config.json"
 )
 
 type config struct {
@@ -51,4 +59,16 @@ func dumpDefaultConfig() error {
 	}
 	_, err = fmt.Print(string(data))
 	return err
+}
+
+func loadDefaultConfig() error {
+	if _, err := os.Stat(defaultConfigPath); os.IsNotExist(err) {
+		logrus.Infof("configure file not found, use default configure")
+		return nil
+	}
+	data, err := ioutil.ReadFile(defaultConfigPath)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, defaultConfig)
 }

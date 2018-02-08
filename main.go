@@ -7,13 +7,7 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-var (
-	configFile string
-)
-
 func main() {
-	flag.StringVar(&configFile, "config", "",
-		"configuration file path, default values will be used if not provided.")
 	flag.Parse()
 
 	if flag.Arg(0) == "dump" {
@@ -22,6 +16,11 @@ func main() {
 			logrus.Fatal(err)
 		}
 		os.Exit(0)
+	}
+
+	err := loadDefaultConfig()
+	if err != nil {
+		logrus.Fatal(err)
 	}
 
 	repos := defaultConfig.Repos

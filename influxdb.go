@@ -10,7 +10,7 @@ import (
 
 func newInfluxDBClient(config *config) (*client.Client, error) {
 	c, err := client.NewHTTPClient(client.HTTPConfig{
-		Addr:     fmt.Sprintf("%s:%d", config.InfluxDBHost, config.InfluxDBPort),
+		Addr:     fmt.Sprintf("http://%s:%d", config.InfluxDBHost, config.InfluxDBPort),
 		Username: config.InfluxDBUserName,
 		Password: config.InfluxDBPassword,
 	})
@@ -20,10 +20,30 @@ func newInfluxDBClient(config *config) (*client.Client, error) {
 	return &c, nil
 }
 
+func createDatabase(clnt *client.Client, DBName string) error {
+	query := client.Query{
+		Command:  fmt.Sprintf("CREATE DATABASE %s", DBName),
+		Database: DBName,
+	}
+	resp, err := (*clnt).Query(query)
+	if err != nil {
+		return err
+	}
+	if resp.Error() != nil {
+		return resp.Error()
+	}
+	return nil
+}
+
 func report(result *Result) error {
 	dbClient, err := newInfluxDBClient(defaultConfig)
 	if err != nil {
 		return err
+	}
+
+	err = createDatabase(dbClient, defaultConfig.InfluxDBName)
+	if err != nil {
+		logrus.Infof("failed to create database: %v", err)
 	}
 
 	logrus.Infof("%#v", result)
@@ -48,7 +68,7 @@ func report(result *Result) error {
 		"ErrNoSrc2":          result.ErrNoSrc2,
 	}
 
-	pt, err := client.NewPoint("cpu_usage", tags, fields, time.Now())
+	pt, err := client.NewPoint("repo_errors", tags, fields, time.Now())
 	if err != nil {
 		return err
 	}
